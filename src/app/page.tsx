@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import { IntroAnimation } from "@/components/intro/IntroAnimation"
+import { BuildingSelector, BuildingInfo } from "@/components/intro/BuildingSelector"
 import { Header } from "@/components/layout/Header"
 import { SummaryCards } from "@/components/dashboard/SummaryCards"
 import { ExpenseTrendChart } from "@/components/dashboard/ExpenseTrendChart"
@@ -9,7 +11,8 @@ import { ExpenseList } from "@/components/expenses/ExpenseList"
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal"
 import { Button } from "@/components/ui/button"
 import { 
-  mockExpenses, 
+  getBuildingExpenses,
+  addExpenseToBuilding,
   getExpenseSummary, 
   getExpenseTrendData, 
   getCategoryBreakdown 
@@ -18,10 +21,60 @@ import { createExpense } from "@/lib/api"
 import { Expense, ExpenseFormData } from "@/types/expense"
 import { Plus, RefreshCw } from "lucide-react"
 
-export default function Dashboard() {
-  const [expenses, setExpenses] = useState<Expense[]>(mockExpenses)
+type AppState = 'intro' | 'select' | 'dashboard'
+
+export default function App() {
+  const [appState, setAppState] = useState<AppState>('intro')
+  const [selectedBuilding, setSelectedBuilding] = useState<BuildingInfo | null>(null)
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const handleIntroComplete = useCallback(() => {
+    setAppState('select')
+  }, [])
+
+  const handleBuildingSelect = useCallback((building: BuildingInfo) => {
+    setSelectedBuilding(building)
+    setExpenses(getBuildingExpenses(building.id))
+    setAppState('dashboard')
+  }, [])
+
+  const handleSwitchBuilding = useCallback(() => {
+    setAppState('select')
+  }, [])
+
+  const handleAddExpense = async (data: ExpenseFormData) => {
+    if (!selectedBuilding) return
+    
+    const newExpense = await createExpense(data)
+    addExpenseToBuilding(selectedBuilding.id, newExpense)
+    setExpenses(prev => [newExpense, ...prev])
+  }
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    if (selectedBuilding) {
+      setExpenses(getBuildingExpenses(selectedBuilding.id))
+    }
+    setIsRefreshing(false)
+  }
+
+  // Show intro animation
+  if (appState === 'intro') {
+    return <IntroAnimation onComplete={handleIntroComplete} />
+  }
+
+  // Show building selector
+  if (appState === 'select') {
+    return <BuildingSelector onSelect={handleBuildingSelect} />
+  }
+
+  // Show dashboard
+  if (!selectedBuilding) {
+    return <BuildingSelector onSelect={handleBuildingSelect} />
+  }
 
   // Calculate summary data
   const summary = getExpenseSummary(expenses)
@@ -31,21 +84,21 @@ export default function Dashboard() {
   // Get recent expenses (last 20)
   const recentExpenses = expenses.slice(0, 20)
 
-  const handleAddExpense = async (data: ExpenseFormData) => {
-    const newExpense = await createExpense(data)
-    setExpenses(prev => [newExpense, ...prev])
-  }
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true)
-    // Simulate data refresh
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setIsRefreshing(false)
+  // Get theme colors based on building
+  const getAccentColor = () => {
+    switch (selectedBuilding.color) {
+      case 'emerald': return 'hsl(142, 71%, 45%)'
+      case 'violet': return 'hsl(262, 83%, 58%)'
+      default: return 'hsl(199, 89%, 48%)'
+    }
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header 
+        building={selectedBuilding} 
+        onSwitchBuilding={handleSwitchBuilding} 
+      />
       
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {/* Page Title & Actions */}
@@ -55,7 +108,7 @@ export default function Dashboard() {
               Dashboard
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Overview of your building expenses and transactions
+              Overview of {selectedBuilding.displayName} expenses and transactions
             </p>
           </div>
           
@@ -70,7 +123,11 @@ export default function Dashboard() {
               <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button size="lg" onClick={() => setIsAddModalOpen(true)}>
+            <Button 
+              size="lg" 
+              onClick={() => setIsAddModalOpen(true)}
+              className={`bg-gradient-to-r ${selectedBuilding.gradient} hover:opacity-90 border-0`}
+            >
               <Plus className="h-5 w-5 mr-2" />
               Add Building Expense
             </Button>
@@ -90,7 +147,7 @@ export default function Dashboard() {
 
         {/* Charts Section */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
-          <ExpenseTrendChart data={trendData} />
+          <ExpenseTrendChart data={trendData} accentColor={getAccentColor()} />
           <CategoryBreakdownChart data={categoryData} />
         </section>
 
@@ -105,7 +162,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>
-              © {new Date().getFullYear()} Bin Ehsan Building. All rights reserved.
+              © {new Date().getFullYear()} {selectedBuilding.displayName}. All rights reserved.
             </p>
             <p className="text-xs">
               Building Expense Management System v1.0
@@ -123,4 +180,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

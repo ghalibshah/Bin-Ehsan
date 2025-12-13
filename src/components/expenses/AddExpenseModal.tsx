@@ -271,3 +271,4 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
   )
 }
 
+

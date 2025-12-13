@@ -1,8 +1,17 @@
 import { Expense, ExpenseCategory, PaymentMethod } from '@/types/expense'
 
-// Generate realistic mock expenses for a residential building
-function generateMockExpenses(): Expense[] {
+// Generate realistic mock expenses for a specific building
+function generateBuildingExpenses(buildingId: string, seed: number): Expense[] {
   const expenses: Expense[] = []
+  
+  // Different expense patterns for different buildings
+  const buildingMultipliers: Record<string, number> = {
+    'bin-ehsan-1': 1,
+    'bin-ehsan-2': 1.3,
+    'bin-ehsan-3': 1.6,
+  }
+  
+  const multiplier = buildingMultipliers[buildingId] || 1
   
   // Monthly recurring expenses
   const recurringExpenses = [
@@ -18,44 +27,55 @@ function generateMockExpenses(): Expense[] {
   const now = new Date()
   const months = 6
   
+  // Use seed to create consistent but different data per building
+  const seededRandom = (min: number, max: number, offset: number) => {
+    const rand = Math.sin(seed + offset) * 10000
+    const normalized = rand - Math.floor(rand)
+    return Math.floor(normalized * (max - min) + min)
+  }
+  
+  let offset = 0
+  
   for (let m = 0; m < months; m++) {
     const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1)
     
     // Add recurring monthly expenses
     recurringExpenses.forEach((expense, index) => {
-      const randomDay = Math.floor(Math.random() * 25) + 1
+      const randomDay = seededRandom(1, 25, offset++)
       const expenseDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), randomDay)
       
       if (expenseDate <= now) {
+        const amount = seededRandom(expense.minAmount, expense.maxAmount, offset++) * multiplier
         expenses.push({
-          id: `exp-${m}-${index}`,
-          amount: Math.floor(Math.random() * (expense.maxAmount - expense.minAmount) + expense.minAmount),
+          id: `${buildingId}-exp-${m}-${index}`,
+          amount: Math.floor(amount),
           category: expense.category,
           date: expenseDate.toISOString().split('T')[0],
-          paymentMethod: ['cash', 'bank', 'online'][Math.floor(Math.random() * 3)] as PaymentMethod,
-          notes: getRandomNote(expense.category),
+          paymentMethod: ['cash', 'bank', 'online'][seededRandom(0, 3, offset++)] as PaymentMethod,
+          notes: getRandomNote(expense.category, seededRandom(0, 100, offset++)),
           createdAt: expenseDate.toISOString(),
         })
       }
     })
     
     // Add random maintenance/repair expenses
-    const randomExpenses = Math.floor(Math.random() * 3) + 1
+    const randomExpenses = seededRandom(1, 4, offset++)
     for (let r = 0; r < randomExpenses; r++) {
-      const isRepair = Math.random() > 0.5
-      const randomDay = Math.floor(Math.random() * 28) + 1
+      const isRepair = seededRandom(0, 2, offset++) === 1
+      const randomDay = seededRandom(1, 28, offset++)
       const expenseDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), randomDay)
       
       if (expenseDate <= now) {
+        const amount = isRepair 
+          ? seededRandom(5000, 25000, offset++) * multiplier
+          : seededRandom(3000, 18000, offset++) * multiplier
         expenses.push({
-          id: `exp-${m}-extra-${r}`,
-          amount: isRepair 
-            ? Math.floor(Math.random() * 20000) + 5000 
-            : Math.floor(Math.random() * 15000) + 3000,
+          id: `${buildingId}-exp-${m}-extra-${r}`,
+          amount: Math.floor(amount),
           category: isRepair ? 'repairs' : 'maintenance',
           date: expenseDate.toISOString().split('T')[0],
-          paymentMethod: ['cash', 'bank', 'online'][Math.floor(Math.random() * 3)] as PaymentMethod,
-          notes: isRepair ? getRepairNote() : getMaintenanceNote(),
+          paymentMethod: ['cash', 'bank', 'online'][seededRandom(0, 3, offset++)] as PaymentMethod,
+          notes: isRepair ? getRepairNote(seededRandom(0, 100, offset++)) : getMaintenanceNote(seededRandom(0, 100, offset++)),
           createdAt: expenseDate.toISOString(),
         })
       }
@@ -66,7 +86,7 @@ function generateMockExpenses(): Expense[] {
   return expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
-function getRandomNote(category: ExpenseCategory): string {
+function getRandomNote(category: ExpenseCategory, rand: number): string {
   const notes: Record<ExpenseCategory, string[]> = {
     electricity: ['Monthly K-Electric bill', 'Electricity bill - peak hours adjustment', 'Common areas electricity'],
     water: ['Monthly KWSB bill', 'Water tanker service', 'Water supply charges'],
@@ -80,10 +100,10 @@ function getRandomNote(category: ExpenseCategory): string {
   }
   
   const categoryNotes = notes[category]
-  return categoryNotes[Math.floor(Math.random() * categoryNotes.length)]
+  return categoryNotes[rand % categoryNotes.length]
 }
 
-function getRepairNote(): string {
+function getRepairNote(rand: number): string {
   const notes = [
     'Water pump motor repair',
     'Electrical panel repair',
@@ -96,10 +116,10 @@ function getRepairNote(): string {
     'Parking area repairs',
     'Staircase railing repair',
   ]
-  return notes[Math.floor(Math.random() * notes.length)]
+  return notes[rand % notes.length]
 }
 
-function getMaintenanceNote(): string {
+function getMaintenanceNote(rand: number): string {
   const notes = [
     'Garden maintenance',
     'Pest control service',
@@ -112,10 +132,35 @@ function getMaintenanceNote(): string {
     'Building inspection',
     'Emergency light batteries',
   ]
-  return notes[Math.floor(Math.random() * notes.length)]
+  return notes[rand % notes.length]
 }
 
-export const mockExpenses = generateMockExpenses()
+// Pre-generate expenses for all buildings
+const buildingSeeds: Record<string, number> = {
+  'bin-ehsan-1': 12345,
+  'bin-ehsan-2': 67890,
+  'bin-ehsan-3': 11223,
+}
+
+const buildingExpensesCache: Record<string, Expense[]> = {}
+
+export function getBuildingExpenses(buildingId: string): Expense[] {
+  if (!buildingExpensesCache[buildingId]) {
+    const seed = buildingSeeds[buildingId] || Math.random() * 100000
+    buildingExpensesCache[buildingId] = generateBuildingExpenses(buildingId, seed)
+  }
+  return buildingExpensesCache[buildingId]
+}
+
+export function addExpenseToBuilding(buildingId: string, expense: Expense): void {
+  if (!buildingExpensesCache[buildingId]) {
+    getBuildingExpenses(buildingId)
+  }
+  buildingExpensesCache[buildingId] = [expense, ...buildingExpensesCache[buildingId]]
+}
+
+// Legacy export for backwards compatibility
+export const mockExpenses = getBuildingExpenses('bin-ehsan-1')
 
 // Calculate summary statistics
 export function getExpenseSummary(expenses: Expense[]) {
@@ -213,4 +258,3 @@ export function getCategoryBreakdown(expenses: Expense[]) {
     }))
     .sort((a, b) => b.amount - a.amount)
 }
-

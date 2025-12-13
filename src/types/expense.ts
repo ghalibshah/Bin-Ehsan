@@ -59,3 +59,4 @@ export function getCategoryInfo(category: ExpenseCategory): CategoryInfo {
   return EXPENSE_CATEGORIES.find(c => c.id === category) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
 }
 
+

@@ -3,8 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -22,16 +20,17 @@ interface TrendDataPoint {
 
 interface ExpenseTrendChartProps {
   data: TrendDataPoint[]
+  accentColor?: string
 }
 
-export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
-  const maxAmount = Math.max(...data.map(d => d.amount))
+export function ExpenseTrendChart({ data, accentColor = "hsl(199, 89%, 48%)" }: ExpenseTrendChartProps) {
+  const maxAmount = Math.max(...data.map(d => d.amount), 1)
   
   return (
     <Card className="col-span-full lg:col-span-2 opacity-0 animate-slide-up animate-stagger-2">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <span className="flex h-2 w-2 rounded-full bg-primary" />
+          <span className="flex h-2 w-2 rounded-full" style={{ backgroundColor: accentColor }} />
           Expense Trend
           <span className="text-xs font-normal text-muted-foreground ml-auto">
             Last 30 days
@@ -47,8 +46,8 @@ export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
             >
               <defs>
                 <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="hsl(199, 89%, 48%)" stopOpacity={0.05} />
+                  <stop offset="0%" stopColor={accentColor} stopOpacity={0.3} />
+                  <stop offset="100%" stopColor={accentColor} stopOpacity={0.05} />
                 </linearGradient>
               </defs>
               <CartesianGrid 
@@ -90,7 +89,7 @@ export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
               <Area
                 type="monotone"
                 dataKey="amount"
-                stroke="hsl(199, 89%, 48%)"
+                stroke={accentColor}
                 strokeWidth={2}
                 fill="url(#expenseGradient)"
               />
@@ -101,4 +100,3 @@ export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
     </Card>
   )
 }
-
