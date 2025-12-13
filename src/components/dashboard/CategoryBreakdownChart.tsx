@@ -35,18 +35,18 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
   })
 
   return (
-    <Card className="col-span-full lg:col-span-1 opacity-0 animate-slide-up animate-stagger-3">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
+    <Card className="col-span-full lg:col-span-1">
+      <CardHeader className="pb-1 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
           Category Breakdown
-          <span className="text-xs font-normal text-muted-foreground ml-auto">
+          <span className="text-[10px] font-normal text-muted-foreground ml-auto">
             This month
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="h-[280px] w-full">
+      <CardContent className="pt-0 px-4 pb-4">
+        <div className="h-[220px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
@@ -107,14 +107,14 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
         </div>
         
         {/* Legend */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {chartData.slice(0, 5).map((item) => (
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
+          {chartData.slice(0, 4).map((item) => (
             <div
               key={item.category}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground"
+              className="flex items-center gap-1 text-[10px] text-muted-foreground"
             >
               <span
-                className="h-2 w-2 rounded-full"
+                className="h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
               <span>{item.icon}</span>

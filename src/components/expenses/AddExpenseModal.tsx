@@ -112,22 +112,22 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Add Building Expense</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-[480px] max-h-[95vh] overflow-y-auto">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl font-semibold">Add Building Expense</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
             Record a new expense for the building. All fields marked with * are required.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-5 py-4">
+        <form onSubmit={handleSubmit} className="space-y-6 py-2">
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount" error={!!errors.amount}>
+            <Label htmlFor="amount" error={!!errors.amount} className="text-sm font-medium">
               Amount (PKR) *
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
                 PKR
               </span>
               <Input
@@ -137,7 +137,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
                 placeholder="0.00"
                 value={formData.amount}
                 onChange={handleAmountChange}
-                className="pl-12"
+                className="pl-14 h-11 text-base"
                 error={!!errors.amount}
               />
             </div>
@@ -148,7 +148,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
 
           {/* Category */}
           <div className="space-y-2">
-            <Label error={!!errors.category}>
+            <Label error={!!errors.category} className="text-sm font-medium">
               Expense Category *
             </Label>
             <Select
@@ -160,7 +160,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
@@ -181,7 +181,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
 
           {/* Date */}
           <div className="space-y-2">
-            <Label htmlFor="date" error={!!errors.date}>
+            <Label htmlFor="date" error={!!errors.date} className="text-sm font-medium">
               Expense Date *
             </Label>
             <Input
@@ -195,6 +195,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
                 }
               }}
               error={!!errors.date}
+              className="h-11"
             />
             {errors.date && (
               <p className="text-xs text-destructive">{errors.date}</p>
@@ -203,7 +204,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
 
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label error={!!errors.paymentMethod}>
+            <Label error={!!errors.paymentMethod} className="text-sm font-medium">
               Payment Method *
             </Label>
             <Select
@@ -215,7 +216,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
                 }
               }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-11">
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
@@ -233,7 +234,7 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">
+            <Label htmlFor="notes" className="text-sm font-medium">
               Notes / Description
             </Label>
             <Textarea
@@ -241,20 +242,21 @@ export function AddExpenseModal({ open, onOpenChange, onSubmit }: AddExpenseModa
               placeholder="Add any additional details about this expense..."
               value={formData.notes}
               onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              rows={3}
+              rows={4}
             />
           </div>
 
-          <DialogFooter className="gap-2 pt-4">
+          <DialogFooter className="gap-3 pt-6">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
+              className="h-10"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} className="h-10">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

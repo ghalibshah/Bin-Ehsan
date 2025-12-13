@@ -100,42 +100,42 @@ export default function App() {
         onSwitchBuilding={handleSwitchBuilding} 
       />
       
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      <main className="container mx-auto px-6 sm:px-8 lg:px-12 py-5 lg:py-6">
         {/* Page Title & Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div>
-            <h2 className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">
+            <h2 className="text-xl lg:text-2xl font-bold text-foreground tracking-tight">
               Dashboard
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Overview of {selectedBuilding.displayName} expenses and transactions
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Overview of {selectedBuilding.displayName} expenses
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="hidden sm:flex"
+              className="hidden sm:flex h-8 text-xs"
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isRefreshing ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
             <Button 
-              size="lg" 
+              size="sm" 
               onClick={() => setIsAddModalOpen(true)}
-              className={`bg-gradient-to-r ${selectedBuilding.gradient} hover:opacity-90 border-0`}
+              className={`bg-gradient-to-r ${selectedBuilding.gradient} hover:opacity-90 border-0 h-8 text-xs`}
             >
-              <Plus className="h-5 w-5 mr-2" />
-              Add Building Expense
+              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              Add Expense
             </Button>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <section className="mb-6 lg:mb-8">
+        <section className="mb-5">
           <SummaryCards
             totalCurrentMonth={summary.totalCurrentMonth}
             totalTransactions={summary.totalTransactions}
@@ -146,7 +146,7 @@ export default function App() {
         </section>
 
         {/* Charts Section */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
           <ExpenseTrendChart data={trendData} accentColor={getAccentColor()} />
           <CategoryBreakdownChart data={categoryData} />
         </section>

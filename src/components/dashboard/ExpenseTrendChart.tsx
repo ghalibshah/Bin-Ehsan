@@ -27,18 +27,18 @@ export function ExpenseTrendChart({ data, accentColor = "hsl(199, 89%, 48%)" }: 
   const maxAmount = Math.max(...data.map(d => d.amount), 1)
   
   return (
-    <Card className="col-span-full lg:col-span-2 opacity-0 animate-slide-up animate-stagger-2">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <span className="flex h-2 w-2 rounded-full" style={{ backgroundColor: accentColor }} />
+    <Card className="col-span-full lg:col-span-2">
+      <CardHeader className="pb-1 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <span className="flex h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accentColor }} />
           Expense Trend
-          <span className="text-xs font-normal text-muted-foreground ml-auto">
+          <span className="text-[10px] font-normal text-muted-foreground ml-auto">
             Last 30 days
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="h-[280px] w-full">
+      <CardContent className="pt-0 px-4 pb-4">
+        <div className="h-[220px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
