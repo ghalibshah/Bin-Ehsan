@@ -1,7 +1,6 @@
 export type ExpenseCategory = 
   | 'electricity'
   | 'water'
-  | 'gas'
   | 'maintenance'
   | 'cleaning'
   | 'security'
@@ -40,7 +39,6 @@ export interface CategoryInfo {
 export const EXPENSE_CATEGORIES: CategoryInfo[] = [
   { id: 'electricity', label: 'Electricity', icon: '⚡', color: 'hsl(38, 92%, 50%)', bgColor: 'hsl(38, 92%, 95%)' },
   { id: 'water', label: 'Water', icon: '💧', color: 'hsl(199, 89%, 48%)', bgColor: 'hsl(199, 89%, 95%)' },
-  { id: 'gas', label: 'Gas', icon: '🔥', color: 'hsl(24, 95%, 53%)', bgColor: 'hsl(24, 95%, 95%)' },
   { id: 'maintenance', label: 'Maintenance', icon: '🔧', color: 'hsl(262, 83%, 58%)', bgColor: 'hsl(262, 83%, 95%)' },
   { id: 'cleaning', label: 'Cleaning', icon: '🧹', color: 'hsl(142, 71%, 45%)', bgColor: 'hsl(142, 71%, 95%)' },
   { id: 'security', label: 'Security', icon: '🛡️', color: 'hsl(220, 70%, 50%)', bgColor: 'hsl(220, 70%, 95%)' },
