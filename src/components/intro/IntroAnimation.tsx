@@ -28,24 +28,15 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 transition-opacity duration-1000 ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[hsl(30,8%,10%)] transition-opacity duration-1000 ${
         stage === 'fade' ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Animated background pattern */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px]">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl animate-pulse" />
-          <div className="absolute inset-12 rounded-full bg-gradient-to-r from-blue-500/10 to-cyan-500/10 blur-2xl animate-pulse" style={{ animationDelay: '0.5s' }} />
-        </div>
-      </div>
-
-      {/* Grid pattern overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.04]"
         style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px',
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px)`,
+          backgroundSize: '48px 48px',
         }}
       />
 
@@ -60,16 +51,8 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
             animation: 'logoEnter 0.8s ease-out forwards',
           }}
         >
-          <div className="relative">
-            {/* Glow effect behind icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-24 h-24 rounded-2xl bg-cyan-500/30 blur-xl animate-pulse" />
-            </div>
-            
-            {/* Icon container */}
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 shadow-2xl shadow-cyan-500/25">
-              <Building2 className="h-10 w-10 text-white" />
-            </div>
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-md bg-[hsl(40,18%,96%)]">
+            <Building2 className="h-10 w-10 text-[hsl(30,8%,12%)]" />
           </div>
         </div>
 
@@ -79,15 +62,13 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
             stage === 'logo' ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
           }`}
         >
-          <p className="text-cyan-400 text-sm font-medium tracking-[0.3em] uppercase mb-3">
+          <p className="text-stone-400 text-sm font-medium tracking-[0.3em] uppercase mb-3">
             Welcome To
           </p>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-4">
-            <span className="bg-gradient-to-r from-white via-cyan-100 to-white bg-clip-text text-transparent">
-              Bin Ehsan
-            </span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-stone-50 tracking-tight mb-4">
+            Bin Ehsan
           </h1>
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-slate-300">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-medium text-stone-400">
             Management Software
           </h2>
         </div>
@@ -99,9 +80,9 @@ export function IntroAnimation({ onComplete }: IntroAnimationProps) {
           }`}
         >
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-stone-300 animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-stone-300 animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-stone-300 animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
         </div>
       </div>

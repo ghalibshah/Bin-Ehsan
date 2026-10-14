@@ -11,12 +11,15 @@
  * 
  * Each building has:
  * - expenses: Expense records
+ * - incomes: Income records
+ * - custom_income_types: Building-specific income types
  * - flats: Flat/unit information
  * - rent_payments: Rent payment history
  * - settings: Building-specific settings
  */
 
 import { Expense, ExpenseFormData, ExpenseCategory } from '@/types/expense'
+import { Income, IncomeFormData } from '@/types/income'
 import { Flat, RentPayment, RentStatus } from '@/types/rental'
 
 // Simulate network delay
@@ -79,6 +82,32 @@ export async function updateExpense(buildingId: string, expenseId: string, data:
 export async function deleteExpense(buildingId: string, expenseId: string): Promise<void> {
   await delay(500)
   console.log('Deleted expense:', expenseId)
+}
+
+// ============================================
+// INCOME API FUNCTIONS
+// ============================================
+
+/**
+ * Create a new income entry.
+ * TODO: Replace with a database insert.
+ */
+export async function createIncome(data: IncomeFormData): Promise<Income> {
+  await delay(800)
+
+  const income: Income = {
+    id: `inc-${Date.now()}`,
+    amount: parseFloat(data.amount),
+    typeId: data.typeId,
+    typeLabel: data.typeLabel,
+    date: data.date,
+    paymentMethod: data.paymentMethod,
+    notes: data.notes || undefined,
+    createdAt: new Date().toISOString(),
+  }
+
+  console.log('Created income:', income)
+  return income
 }
 
 // ============================================
@@ -231,6 +260,23 @@ export async function updateBuildingSettings(
  *   - date (date)
  *   - payment_method (text)
  *   - notes (text, nullable)
+ *   - created_at (timestamp)
+ *
+ * incomes:
+ *   - id (uuid, primary key)
+ *   - building_id (uuid, foreign key)
+ *   - amount (numeric)
+ *   - type_id (text)
+ *   - type_label (text)
+ *   - date (date)
+ *   - payment_method (text)
+ *   - notes (text, nullable)
+ *   - created_at (timestamp)
+ *
+ * custom_income_types:
+ *   - id (text, primary key)
+ *   - building_id (uuid, foreign key)
+ *   - label (text)
  *   - created_at (timestamp)
  * 
  * flats:

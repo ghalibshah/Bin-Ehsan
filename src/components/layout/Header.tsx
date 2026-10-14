@@ -9,15 +9,17 @@ interface HeaderProps {
 }
 
 export function Header({ building, onSwitchBuilding }: HeaderProps) {
-  const gradientClass = building?.gradient || "from-cyan-500 to-blue-600"
-  
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex h-12 items-center justify-between">
           {/* Logo & Branding */}
           <div className="flex items-center gap-2">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${gradientClass} text-white shadow-md cursor-pointer`} onClick={onSwitchBuilding}>
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-md text-primary-foreground cursor-pointer"
+              style={{ backgroundColor: building?.mark || "hsl(152, 16%, 22%)" }}
+              onClick={onSwitchBuilding}
+            >
               <Building2 className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
@@ -25,7 +27,7 @@ export function Header({ building, onSwitchBuilding }: HeaderProps) {
                 {building?.displayName || "Bin Ehsan Building"}
               </h1>
               <p className="text-[10px] text-muted-foreground leading-tight">
-                Expense Management
+                Building management
               </p>
             </div>
           </div>

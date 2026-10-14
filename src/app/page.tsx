@@ -6,12 +6,18 @@ import { BuildingSelector, BuildingInfo } from "@/components/intro/BuildingSelec
 import { Header } from "@/components/layout/Header"
 import { Sidebar, NavItem } from "@/components/layout/Sidebar"
 import { SummaryCards } from "@/components/dashboard/SummaryCards"
-import { ExpenseTrendChart } from "@/components/dashboard/ExpenseTrendChart"
 import { CategoryBreakdownChart } from "@/components/dashboard/CategoryBreakdownChart"
 import { ExpenseList } from "@/components/expenses/ExpenseList"
 import { AddExpenseModal } from "@/components/expenses/AddExpenseModal"
 import { RentalDashboard } from "@/components/rental/RentalDashboard"
 import { SettingsPage } from "@/components/settings/SettingsPage"
+import { IncomeSummaryCards } from "@/components/income/IncomeSummaryCards"
+import { IncomeBreakdownChart } from "@/components/income/IncomeBreakdownChart"
+import { IncomeList } from "@/components/income/IncomeList"
+import { AddIncomeModal } from "@/components/income/AddIncomeModal"
+import { IncomeTypeManager } from "@/components/income/IncomeTypeManager"
+import { ProfitDistributionCard } from "@/components/income/ProfitDistributionCard"
+import { ExpenseTrendChart } from "@/components/dashboard/ExpenseTrendChart"
 import { Button } from "@/components/ui/button"
 import { 
   getBuildingExpenses,
@@ -27,9 +33,18 @@ import {
   removeFlatFromBuilding,
   updateFlatInBuilding,
   addRentPayment,
+  getBuildingIncomes,
+  addIncomeToBuilding,
+  getCustomIncomeTypes,
+  addCustomIncomeType,
+  removeCustomIncomeType,
+  getIncomeSummary,
+  getIncomeTrendData,
+  getIncomeTypeBreakdown,
 } from "@/data/mockData"
-import { createExpense } from "@/lib/api"
+import { createExpense, createIncome } from "@/lib/api"
 import { Expense, ExpenseFormData } from "@/types/expense"
+import { CustomIncomeType, Income, IncomeFormData } from "@/types/income"
 import { Flat, RentPayment, RentStatus } from "@/types/rental"
 import { Plus, RefreshCw } from "lucide-react"
 
@@ -40,9 +55,12 @@ export default function App() {
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingInfo | null>(null)
   const [activeNav, setActiveNav] = useState<NavItem>('expenses')
   const [expenses, setExpenses] = useState<Expense[]>([])
+  const [incomes, setIncomes] = useState<Income[]>([])
+  const [customIncomeTypes, setCustomIncomeTypes] = useState<CustomIncomeType[]>([])
   const [flats, setFlats] = useState<Flat[]>([])
   const [rentPayments, setRentPayments] = useState<RentPayment[]>([])
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isAddIncomeOpen, setIsAddIncomeOpen] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -53,6 +71,8 @@ export default function App() {
   const handleBuildingSelect = useCallback((building: BuildingInfo) => {
     setSelectedBuilding(building)
     setExpenses(getBuildingExpenses(building.id))
+    setIncomes(getBuildingIncomes(building.id))
+    setCustomIncomeTypes(getCustomIncomeTypes(building.id))
     setFlats(getBuildingFlats(building.id))
     setRentPayments(getBuildingRentPayments(building.id))
     setActiveNav('expenses')
@@ -66,6 +86,27 @@ export default function App() {
   const handleNavigation = useCallback((item: NavItem) => {
     setActiveNav(item)
   }, [])
+
+  const handleAddIncome = async (data: IncomeFormData) => {
+    if (!selectedBuilding) return
+    const income = await createIncome(data)
+    addIncomeToBuilding(selectedBuilding.id, income)
+    setIncomes(getBuildingIncomes(selectedBuilding.id))
+  }
+
+  const handleAddIncomeType = (label: string) => {
+    if (!selectedBuilding) return
+    const created = addCustomIncomeType(selectedBuilding.id, label)
+    if (created) {
+      setCustomIncomeTypes(getCustomIncomeTypes(selectedBuilding.id))
+    }
+  }
+
+  const handleRemoveIncomeType = (typeId: string) => {
+    if (!selectedBuilding) return
+    removeCustomIncomeType(selectedBuilding.id, typeId)
+    setCustomIncomeTypes(getCustomIncomeTypes(selectedBuilding.id))
+  }
 
   const handleAddExpense = async (data: ExpenseFormData) => {
     if (!selectedBuilding) return
@@ -134,6 +175,8 @@ export default function App() {
     await new Promise(resolve => setTimeout(resolve, 1000))
     if (selectedBuilding) {
       setExpenses(getBuildingExpenses(selectedBuilding.id))
+      setIncomes(getBuildingIncomes(selectedBuilding.id))
+      setCustomIncomeTypes(getCustomIncomeTypes(selectedBuilding.id))
       setFlats(getBuildingFlats(selectedBuilding.id))
       setRentPayments(getBuildingRentPayments(selectedBuilding.id))
       setRefreshKey(prev => prev + 1)
@@ -164,16 +207,9 @@ export default function App() {
   const flatsWithRent = getFlatsWithRentStatus(selectedBuilding.id)
   const rentalSummary = getRentalSummary(selectedBuilding.id)
 
-  const getAccentColor = () => {
-    switch (selectedBuilding.color) {
-      case 'emerald': return 'hsl(142, 71%, 45%)'
-      case 'violet': return 'hsl(262, 83%, 58%)'
-      default: return 'hsl(199, 89%, 48%)'
-    }
-  }
-
   const getPageTitle = () => {
     switch (activeNav) {
+      case 'income': return 'Income'
       case 'expenses': return 'General Expenses'
       case 'rental': return 'Rental Management'
       case 'settings': return 'Settings'
@@ -182,11 +218,16 @@ export default function App() {
 
   const getPageDescription = () => {
     switch (activeNav) {
+      case 'income': return `Record money received for ${selectedBuilding.displayName}`
       case 'expenses': return `Track and manage ${selectedBuilding.displayName} expenses`
       case 'rental': return `Manage flats and rent collection for ${selectedBuilding.displayName}`
       case 'settings': return `Configure ${selectedBuilding.displayName} settings`
     }
   }
+
+  const incomeSummary = getIncomeSummary(incomes)
+  const incomeTrend = getIncomeTrendData(incomes)
+  const incomeBreakdown = getIncomeTypeBreakdown(incomes)
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -217,7 +258,7 @@ export default function App() {
                 </p>
               </div>
               
-              {activeNav === 'expenses' && (
+              {(activeNav === 'expenses' || activeNav === 'income') && (
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -229,19 +270,57 @@ export default function App() {
                     <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isRefreshing ? 'animate-spin' : ''}`} />
                     Refresh
                   </Button>
-                  <Button 
-                    size="sm" 
-                    onClick={() => setIsAddModalOpen(true)}
-                    className={`bg-gradient-to-r ${selectedBuilding.gradient} hover:opacity-90 border-0 h-8 text-xs`}
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1.5" />
-                    Add Expense
-                  </Button>
+                  {activeNav === 'expenses' ? (
+                    <Button
+                      size="sm"
+                      onClick={() => setIsAddModalOpen(true)}
+                      className="h-8 text-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5 mr-1.5" />
+                      Add Expense
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      onClick={() => setIsAddIncomeOpen(true)}
+                      className="h-8 text-xs"
+                    >
+                      <Plus className="h-3.5 w-3.5 mr-1.5" />
+                      Add income
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
 
             {/* Content based on active nav */}
+            {activeNav === 'income' && (
+              <div className="space-y-5">
+                <IncomeSummaryCards
+                  totalCurrentMonth={incomeSummary.totalCurrentMonth}
+                  totalTransactions={incomeSummary.totalTransactions}
+                  highestTypeLabel={incomeSummary.highestTypeLabel}
+                  highestTypeAmount={incomeSummary.highestTypeAmount}
+                  averageMonthly={incomeSummary.averageMonthly}
+                />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <ExpenseTrendChart
+                    data={incomeTrend}
+                    title="Income trend"
+                    gradientId="incomeGradient"
+                  />
+                  <IncomeBreakdownChart data={incomeBreakdown} customTypes={customIncomeTypes} />
+                </div>
+                <ProfitDistributionCard />
+                <IncomeTypeManager
+                  customTypes={customIncomeTypes}
+                  onAdd={handleAddIncomeType}
+                  onRemove={handleRemoveIncomeType}
+                />
+                <IncomeList incomes={incomes} customTypes={customIncomeTypes} />
+              </div>
+            )}
+
             {activeNav === 'expenses' && (
               <div className="space-y-5">
                 <SummaryCards
@@ -253,7 +332,7 @@ export default function App() {
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <ExpenseTrendChart data={trendData} accentColor={getAccentColor()} />
+                  <ExpenseTrendChart data={trendData} />
                   <CategoryBreakdownChart data={categoryData} />
                 </div>
 
@@ -277,6 +356,9 @@ export default function App() {
                 buildingId={selectedBuilding.id}
                 buildingName={selectedBuilding.displayName}
                 flats={flats}
+                customIncomeTypes={customIncomeTypes}
+                onAddIncomeType={handleAddIncomeType}
+                onRemoveIncomeType={handleRemoveIncomeType}
                 onAddFlat={handleAddFlat}
                 onRemoveFlat={handleRemoveFlat}
                 onEditFlat={handleEditFlat}
@@ -291,6 +373,12 @@ export default function App() {
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddExpense}
+      />
+      <AddIncomeModal
+        open={isAddIncomeOpen}
+        onOpenChange={setIsAddIncomeOpen}
+        customTypes={customIncomeTypes}
+        onSubmit={handleAddIncome}
       />
     </div>
   )

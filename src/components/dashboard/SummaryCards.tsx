@@ -41,16 +41,16 @@ export function SummaryCards({
       subtitle: "This Month",
       value: totalTransactions.toString(),
       icon: Receipt,
-      iconBg: "bg-emerald-500/10",
-      iconColor: "text-emerald-600",
+      iconBg: "bg-secondary",
+      iconColor: "text-foreground",
     },
     {
       title: "Highest Category",
       subtitle: categoryInfo.label,
       value: formatCurrency(highestCategoryAmount),
       icon: TrendingUp,
-      iconBg: "bg-amber-500/10",
-      iconColor: "text-amber-600",
+      iconBg: "bg-[hsl(36,36%,94%)]",
+      iconColor: "text-[hsl(32,36%,34%)]",
       badge: categoryInfo.icon,
     },
     {
@@ -58,8 +58,8 @@ export function SummaryCards({
       subtitle: "Last 6 Months",
       value: formatCurrency(averageMonthly),
       icon: BarChart3,
-      iconBg: "bg-violet-500/10",
-      iconColor: "text-violet-600",
+      iconBg: "bg-secondary",
+      iconColor: "text-foreground",
     },
   ]
 

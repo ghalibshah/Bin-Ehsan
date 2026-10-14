@@ -77,9 +77,9 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
 
   const getPaymentMethodBadge = (method: string) => {
     const styles = {
-      cash: 'bg-emerald-500/10 text-emerald-700',
-      bank: 'bg-primary/10 text-primary',
-      online: 'bg-violet-500/10 text-violet-700',
+      cash: 'bg-primary/10 text-primary',
+      bank: 'bg-secondary text-foreground',
+      online: 'bg-[hsl(32,22%,94%)] text-[hsl(28,24%,32%)]',
     }
     const labels = {
       cash: 'Cash',
@@ -100,7 +100,7 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-violet-500" />
+              <span className="flex h-1.5 w-1.5 rounded-full bg-primary" />
               Recent Expenses
               <span className="text-xs font-normal text-muted-foreground ml-2">
                 {filteredExpenses.length} of {expenses.length} transactions

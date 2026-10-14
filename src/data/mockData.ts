@@ -1,4 +1,5 @@
 import { Expense, ExpenseCategory, PaymentMethod } from '@/types/expense'
+import { BUILTIN_INCOME_TYPES, BuiltinIncomeTypeId, CustomIncomeType, Income } from '@/types/income'
 import { Flat, RentPayment, FlatWithRent, RentStatus } from '@/types/rental'
 
 // Generate realistic mock expenses for a specific building
@@ -501,4 +502,206 @@ export function getRentalSummary(buildingId: string) {
     totalDue,
     collectionRate: expectedRent > 0 ? Math.round((collectedRent / expectedRent) * 100) : 0,
   }
+}
+
+const INCOME_RANGES: Record<BuiltinIncomeTypeId, { min: number; max: number; monthly: boolean }> = {
+  rental: { min: 180000, max: 420000, monthly: true },
+  furnished_rental: { min: 60000, max: 160000, monthly: true },
+  maintenance: { min: 25000, max: 70000, monthly: true },
+  commissions: { min: 15000, max: 80000, monthly: false },
+  electricity_profit: { min: 8000, max: 35000, monthly: true },
+  solar_profit: { min: 12000, max: 45000, monthly: false },
+}
+
+const INCOME_NOTES: Record<BuiltinIncomeTypeId, string[]> = {
+  rental: ['Monthly rent collected', 'Rent received for occupied flats', 'Rental receipts'],
+  furnished_rental: ['Furnished unit rent', 'Short furnished stay', 'Furnished rental receipt'],
+  maintenance: ['Maintenance charges collected', 'Tenant maintenance contribution', 'Monthly maintenance income'],
+  commissions: ['Broker commission', 'Referral commission', 'Letting commission'],
+  electricity_profit: ['Common-area electricity surplus', 'Electricity margin this month', 'Metered electricity profit'],
+  solar_profit: ['Solar generation credit', 'Solar surplus this month', 'Solar export profit'],
+}
+
+function generateBuildingIncomes(buildingId: string, seed: number): Income[] {
+  const incomes: Income[] = []
+  const buildingMultipliers: Record<string, number> = {
+    'bin-ehsan-1': 1,
+    'bin-ehsan-2': 1.25,
+    'bin-ehsan-3': 1.5,
+  }
+  const multiplier = buildingMultipliers[buildingId] || 1
+  const now = new Date()
+  const seededRandom = (min: number, max: number, offset: number) => {
+    const rand = Math.sin(seed + offset) * 10000
+    const normalized = rand - Math.floor(rand)
+    return Math.floor(normalized * (max - min) + min)
+  }
+
+  let offset = 500
+  const typeIds = Object.keys(INCOME_RANGES) as BuiltinIncomeTypeId[]
+
+  for (let m = 0; m < 6; m++) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - m, 1)
+    typeIds.forEach((typeId, index) => {
+      const range = INCOME_RANGES[typeId]
+      if (!range.monthly && seededRandom(0, 10, offset++) < 4) return
+
+      const randomDay = seededRandom(1, 26, offset++)
+      const incomeDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), randomDay)
+      if (incomeDate > now) return
+
+      const info = BUILTIN_INCOME_TYPES.find((type) => type.id === typeId)
+      const notes = INCOME_NOTES[typeId]
+      incomes.push({
+        id: `${buildingId}-inc-${m}-${index}`,
+        amount: Math.floor(seededRandom(range.min, range.max, offset++) * multiplier),
+        typeId,
+        typeLabel: info?.label || typeId,
+        date: incomeDate.toISOString().split('T')[0],
+        paymentMethod: ['cash', 'bank', 'online'][seededRandom(0, 3, offset++)] as PaymentMethod,
+        notes: notes[seededRandom(0, notes.length, offset++)],
+        createdAt: incomeDate.toISOString(),
+      })
+    })
+  }
+
+  return incomes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+
+const buildingIncomesCache: Record<string, Income[]> = {}
+const buildingCustomIncomeTypesCache: Record<string, CustomIncomeType[]> = {}
+
+export function getBuildingIncomes(buildingId: string): Income[] {
+  if (!buildingIncomesCache[buildingId]) {
+    const seed = buildingSeeds[buildingId] || Math.random() * 100000
+    buildingIncomesCache[buildingId] = generateBuildingIncomes(buildingId, seed + 2500)
+  }
+  return buildingIncomesCache[buildingId]
+}
+
+export function addIncomeToBuilding(buildingId: string, income: Income): void {
+  if (!buildingIncomesCache[buildingId]) {
+    getBuildingIncomes(buildingId)
+  }
+  buildingIncomesCache[buildingId] = [income, ...buildingIncomesCache[buildingId]]
+}
+
+export function getCustomIncomeTypes(buildingId: string): CustomIncomeType[] {
+  if (!buildingCustomIncomeTypesCache[buildingId]) {
+    buildingCustomIncomeTypesCache[buildingId] = []
+  }
+  return buildingCustomIncomeTypesCache[buildingId]
+}
+
+export function addCustomIncomeType(buildingId: string, label: string): CustomIncomeType | null {
+  const trimmed = label.trim()
+  if (!trimmed) return null
+
+  const existing = getCustomIncomeTypes(buildingId)
+  const duplicateCustom = existing.some((type) => type.label.toLowerCase() === trimmed.toLowerCase())
+  const duplicateBuiltin = BUILTIN_INCOME_TYPES.some((type) => type.label.toLowerCase() === trimmed.toLowerCase())
+  if (duplicateCustom || duplicateBuiltin) return null
+
+  const created: CustomIncomeType = {
+    id: `custom-${Date.now()}`,
+    label: trimmed,
+  }
+  buildingCustomIncomeTypesCache[buildingId] = [...existing, created]
+  return created
+}
+
+export function removeCustomIncomeType(buildingId: string, typeId: string): void {
+  const existing = getCustomIncomeTypes(buildingId)
+  buildingCustomIncomeTypesCache[buildingId] = existing.filter((type) => type.id !== typeId)
+}
+
+export function getIncomeSummary(incomes: Income[]) {
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  const currentMonthIncomes = incomes.filter((entry) => {
+    const entryDate = new Date(entry.date)
+    return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear
+  })
+
+  const totalCurrentMonth = currentMonthIncomes.reduce((sum, entry) => sum + entry.amount, 0)
+  const totalTransactions = currentMonthIncomes.length
+
+  const typeTotals = currentMonthIncomes.reduce((acc, entry) => {
+    const key = entry.typeId
+    acc[key] = acc[key] || { typeId: entry.typeId, label: entry.typeLabel, total: 0 }
+    acc[key].total += entry.amount
+    return acc
+  }, {} as Record<string, { typeId: string; label: string; total: number }>)
+
+  const highestType = Object.values(typeTotals).reduce(
+    (max, entry) => (entry.total > max.total ? entry : max),
+    { typeId: 'rental', label: 'Rental income', total: 0 }
+  )
+
+  const monthlyTotals = incomes.reduce((acc, entry) => {
+    const entryDate = new Date(entry.date)
+    const key = `${entryDate.getFullYear()}-${entryDate.getMonth()}`
+    acc[key] = (acc[key] || 0) + entry.amount
+    return acc
+  }, {} as Record<string, number>)
+
+  const monthlyValues = Object.values(monthlyTotals)
+  const averageMonthly = monthlyValues.length > 0
+    ? monthlyValues.reduce((sum, value) => sum + value, 0) / monthlyValues.length
+    : 0
+
+  return {
+    totalCurrentMonth,
+    totalTransactions,
+    highestTypeId: highestType.typeId,
+    highestTypeLabel: highestType.label,
+    highestTypeAmount: highestType.total,
+    averageMonthly,
+  }
+}
+
+export function getIncomeTrendData(incomes: Income[]) {
+  const now = new Date()
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const dailyTotals: Record<string, number> = {}
+
+  for (let d = new Date(thirtyDaysAgo); d <= now; d.setDate(d.getDate() + 1)) {
+    const dateStr = d.toISOString().split('T')[0]
+    dailyTotals[dateStr] = 0
+  }
+
+  incomes.forEach((entry) => {
+    if (Object.prototype.hasOwnProperty.call(dailyTotals, entry.date)) {
+      dailyTotals[entry.date] += entry.amount
+    }
+  })
+
+  return Object.entries(dailyTotals).map(([date, amount]) => ({
+    date,
+    amount,
+    formattedDate: new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+  }))
+}
+
+export function getIncomeTypeBreakdown(incomes: Income[]) {
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  const currentMonthIncomes = incomes.filter((entry) => {
+    const entryDate = new Date(entry.date)
+    return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear
+  })
+
+  const typeTotals = currentMonthIncomes.reduce((acc, entry) => {
+    if (!acc[entry.typeId]) {
+      acc[entry.typeId] = { typeId: entry.typeId, label: entry.typeLabel, amount: 0 }
+    }
+    acc[entry.typeId].amount += entry.amount
+    return acc
+  }, {} as Record<string, { typeId: string; label: string; amount: number }>)
+
+  return Object.values(typeTotals).sort((a, b) => b.amount - a.amount)
 }

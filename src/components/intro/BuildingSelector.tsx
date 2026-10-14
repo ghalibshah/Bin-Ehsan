@@ -10,8 +10,7 @@ export interface BuildingInfo {
   address: string
   units: number
   established: string
-  color: string
-  gradient: string
+  mark: string
 }
 
 export const BUILDINGS: BuildingInfo[] = [
@@ -22,8 +21,7 @@ export const BUILDINGS: BuildingInfo[] = [
     address: "Block A, Gulshan-e-Iqbal",
     units: 12,
     established: "2018",
-    color: "cyan",
-    gradient: "from-cyan-500 to-blue-600",
+    mark: "hsl(30, 8%, 22%)",
   },
   {
     id: "bin-ehsan-2",
@@ -32,8 +30,7 @@ export const BUILDINGS: BuildingInfo[] = [
     address: "Block B, Gulshan-e-Iqbal",
     units: 16,
     established: "2020",
-    color: "emerald",
-    gradient: "from-emerald-500 to-teal-600",
+    mark: "hsl(80, 14%, 30%)",
   },
   {
     id: "bin-ehsan-3",
@@ -42,8 +39,7 @@ export const BUILDINGS: BuildingInfo[] = [
     address: "Block C, Gulshan-e-Iqbal",
     units: 20,
     established: "2023",
-    color: "violet",
-    gradient: "from-violet-500 to-purple-600",
+    mark: "hsl(28, 28%, 36%)",
   },
 ]
 
@@ -55,7 +51,7 @@ export function BuildingSelector({ onSelect }: BuildingSelectorProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
+    <div className="min-h-screen bg-background">
       {/* Background pattern */}
       <div 
         className="fixed inset-0 opacity-[0.015]"
@@ -68,13 +64,13 @@ export function BuildingSelector({ onSelect }: BuildingSelectorProps) {
       <div className="relative z-10 container mx-auto px-4 py-6 lg:py-10">
         {/* Header */}
         <div className="text-center mb-8 lg:mb-10">
-          <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-md shadow-cyan-500/20 mb-4">
-            <Building2 className="h-5 w-5 text-white" />
+          <div className="inline-flex items-center justify-center w-11 h-11 rounded-md bg-primary mb-4">
+            <Building2 className="h-5 w-5 text-primary-foreground" />
           </div>
-          <h1 className="text-xl md:text-2xl font-semibold text-slate-900 tracking-tight mb-2">
+          <h1 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight mb-2">
             Select Your Building
           </h1>
-          <p className="text-sm text-slate-500 max-w-sm mx-auto">
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
             Choose which building you want to manage
           </p>
         </div>
@@ -99,73 +95,58 @@ export function BuildingSelector({ onSelect }: BuildingSelectorProps) {
               >
                 {/* Card */}
                 <div 
-                  className={`relative overflow-hidden rounded-2xl bg-white border border-slate-200/60 p-7 lg:p-9 transition-all duration-500 ${
+                  className={`relative overflow-hidden rounded-xl bg-card border p-7 lg:p-9 transition-all duration-300 ${
                     isHovered 
-                      ? 'shadow-2xl shadow-slate-300/60 scale-[1.03] border-transparent' 
-                      : 'shadow-xl shadow-slate-200/50'
+                      ? 'shadow-soft-lg border-foreground/20' 
+                      : 'shadow-soft border-border'
                   }`}
                 >
-                  {/* Top gradient bar */}
-                  <div 
-                    className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${building.gradient} transition-all duration-500 ${
-                      isHovered ? 'h-2' : 'h-1.5'
-                    }`}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-1"
+                    style={{ backgroundColor: building.mark }}
                   />
 
-                  {/* Building icon */}
-                  <div 
-                    className={`mb-6 inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br ${building.gradient} shadow-lg transition-transform duration-500 ${
-                      isHovered ? 'scale-110 rotate-3' : ''
-                    }`}
+                  <div
+                    className="mb-6 inline-flex items-center justify-center w-14 h-14 rounded-md text-primary-foreground"
+                    style={{ backgroundColor: building.mark }}
                   >
-                    <Building2 className="h-8 w-8 text-white" />
+                    <Building2 className="h-7 w-7" />
                   </div>
 
-                  {/* Building name */}
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                  <h3 className="text-2xl font-semibold text-foreground mb-3">
                     {building.displayName}
                   </h3>
 
-                  {/* Details */}
                   <div className="space-y-2.5 mb-7">
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                      <MapPin className="h-4 w-4 text-slate-400" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
                       {building.address}
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-slate-600">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4 text-slate-400" />
+                        <Users className="h-4 w-4" />
                         {building.units} Units
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <Calendar className="h-4 w-4" />
                         Est. {building.established}
                       </div>
                     </div>
                   </div>
 
-                  {/* Action row */}
-                  <div 
-                    className={`flex items-center justify-between pt-5 border-t border-slate-100 transition-colors duration-300`}
-                  >
-                    <span className={`text-sm font-medium bg-gradient-to-r ${building.gradient} bg-clip-text text-transparent`}>
-                      Open Dashboard
+                  <div className="flex items-center justify-between pt-5 border-t border-border">
+                    <span className="text-sm font-medium text-foreground">
+                      Open dashboard
                     </span>
-                    <div 
-                      className={`flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br ${building.gradient} text-white transition-all duration-500 ${
+                    <div
+                      className={`flex items-center justify-center w-8 h-8 rounded-full text-primary-foreground transition-transform duration-300 ${
                         isHovered ? 'translate-x-1' : ''
                       }`}
+                      style={{ backgroundColor: building.mark }}
                     >
                       <ChevronRight className="h-4 w-4" />
                     </div>
                   </div>
-
-                  {/* Hover glow effect */}
-                  <div 
-                    className={`absolute -inset-px rounded-2xl bg-gradient-to-r ${building.gradient} opacity-0 blur-xl transition-opacity duration-500 -z-10 ${
-                      isHovered ? 'opacity-20' : ''
-                    }`}
-                  />
                 </div>
               </button>
             )
@@ -173,7 +154,7 @@ export function BuildingSelector({ onSelect }: BuildingSelectorProps) {
         </div>
 
         {/* Footer note */}
-        <p className="text-center text-sm text-slate-400 mt-12">
+        <p className="text-center text-sm text-muted-foreground mt-12">
           Bin Ehsan Building Management System v1.0
         </p>
       </div>

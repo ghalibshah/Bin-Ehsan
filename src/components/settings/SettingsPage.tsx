@@ -13,14 +13,19 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { EXPENSE_CATEGORIES, ExpenseCategory } from "@/types/expense"
+import { CustomIncomeType } from "@/types/income"
+import { IncomeTypeManager } from "@/components/income/IncomeTypeManager"
 import { Flat, FLAT_TYPES } from "@/types/rental"
-import { Plus, Trash2, Receipt, Home, AlertCircle, Edit2, Check, X } from "lucide-react"
+import { Plus, Trash2, Receipt, Home, Wallet, AlertCircle, Edit2, Check, X } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
 interface SettingsPageProps {
   buildingId: string
   buildingName: string
   flats: Flat[]
+  customIncomeTypes: CustomIncomeType[]
+  onAddIncomeType: (label: string) => void
+  onRemoveIncomeType: (typeId: string) => void
   onAddFlat: (flat: Omit<Flat, 'id'>) => void
   onRemoveFlat: (flatId: string) => void
   onEditFlat: (flatId: string, updates: Partial<Flat>) => void
@@ -29,13 +34,15 @@ interface SettingsPageProps {
 
 export function SettingsPage({ 
   buildingId, 
-  buildingName, 
-  flats, 
+  flats,
+  customIncomeTypes,
+  onAddIncomeType,
+  onRemoveIncomeType,
   onAddFlat, 
   onRemoveFlat,
   onEditFlat 
 }: SettingsPageProps) {
-  const [activeTab, setActiveTab] = useState<'expenses' | 'flats'>('flats')
+  const [activeTab, setActiveTab] = useState<'expenses' | 'income' | 'flats'>('flats')
   
   return (
     <div className="space-y-5">
@@ -59,6 +66,15 @@ export function SettingsPage({
           <Receipt className="h-3.5 w-3.5 mr-1.5" />
           Expense Types
         </Button>
+        <Button
+          variant={activeTab === 'income' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('income')}
+          className="h-8 text-xs"
+        >
+          <Wallet className="h-3.5 w-3.5 mr-1.5" />
+          Income Types
+        </Button>
       </div>
 
       {activeTab === 'flats' ? (
@@ -68,6 +84,12 @@ export function SettingsPage({
           onAddFlat={onAddFlat} 
           onRemoveFlat={onRemoveFlat}
           onEditFlat={onEditFlat}
+        />
+      ) : activeTab === 'income' ? (
+        <IncomeTypeManager
+          customTypes={customIncomeTypes}
+          onAdd={onAddIncomeType}
+          onRemove={onRemoveIncomeType}
         />
       ) : (
         <ExpenseTypesManagement />
@@ -369,7 +391,7 @@ function FlatsManagement({ buildingId, flats, onAddFlat, onRemoveFlat, onEditFla
                             {flat.tenantName}
                           </span>
                         )}
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${flat.isOccupied ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${flat.isOccupied ? 'bg-primary/10 text-primary' : 'bg-[hsl(36,36%,94%)] text-[hsl(32,36%,34%)]'}`}>
                           {flat.isOccupied ? 'Occupied' : 'Vacant'}
                         </span>
                         <Button
@@ -449,7 +471,7 @@ function ExpenseTypesManagement() {
       <Card>
         <CardHeader className="pb-2 pt-4 px-4">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <span className="flex h-1.5 w-1.5 rounded-full bg-violet-500" />
+            <span className="flex h-1.5 w-1.5 rounded-full bg-primary" />
             Custom Expense Types
           </CardTitle>
           <CardDescription className="text-xs">
@@ -480,7 +502,7 @@ function ExpenseTypesManagement() {
               {customTypes.map((type) => (
                 <span 
                   key={type}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-violet-500/10 text-violet-600"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-secondary text-foreground"
                 >
                   📋 {type}
                   <button

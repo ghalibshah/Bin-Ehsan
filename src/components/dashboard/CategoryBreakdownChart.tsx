@@ -38,7 +38,7 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
     <Card className="col-span-full lg:col-span-1">
       <CardHeader className="pb-1 pt-4 px-4">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span className="flex h-1.5 w-1.5 rounded-full bg-primary" />
           Category Breakdown
           <span className="text-[10px] font-normal text-muted-foreground ml-auto">
             This month
@@ -55,26 +55,26 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
             >
               <CartesianGrid 
                 strokeDasharray="3 3" 
-                stroke="hsl(220, 13%, 91%)" 
+                stroke="hsl(32, 10%, 86%)" 
                 horizontal={false}
               />
               <XAxis
                 type="number"
-                tick={{ fontSize: 11, fill: 'hsl(220, 9%, 46%)' }}
+                tick={{ fontSize: 11, fill: 'hsl(30, 6%, 42%)' }}
                 tickLine={false}
-                axisLine={{ stroke: 'hsl(220, 13%, 91%)' }}
+                axisLine={{ stroke: 'hsl(32, 10%, 86%)' }}
                 tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
               />
               <YAxis
                 dataKey="name"
                 type="category"
-                tick={{ fontSize: 11, fill: 'hsl(220, 9%, 46%)' }}
+                tick={{ fontSize: 11, fill: 'hsl(30, 6%, 42%)' }}
                 tickLine={false}
                 axisLine={false}
                 width={80}
               />
               <Tooltip
-                cursor={{ fill: 'hsl(220, 14%, 96%)' }}
+                cursor={{ fill: 'hsl(36, 14%, 95%)' }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload

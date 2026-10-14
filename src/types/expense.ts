@@ -37,14 +37,14 @@ export interface CategoryInfo {
 }
 
 export const EXPENSE_CATEGORIES: CategoryInfo[] = [
-  { id: 'electricity', label: 'Electricity', icon: '⚡', color: 'hsl(38, 92%, 50%)', bgColor: 'hsl(38, 92%, 95%)' },
-  { id: 'water', label: 'Water', icon: '💧', color: 'hsl(199, 89%, 48%)', bgColor: 'hsl(199, 89%, 95%)' },
-  { id: 'maintenance', label: 'Maintenance', icon: '🔧', color: 'hsl(262, 83%, 58%)', bgColor: 'hsl(262, 83%, 95%)' },
-  { id: 'cleaning', label: 'Cleaning', icon: '🧹', color: 'hsl(142, 71%, 45%)', bgColor: 'hsl(142, 71%, 95%)' },
-  { id: 'security', label: 'Security', icon: '🛡️', color: 'hsl(220, 70%, 50%)', bgColor: 'hsl(220, 70%, 95%)' },
-  { id: 'repairs', label: 'Repairs', icon: '🛠️', color: 'hsl(340, 82%, 52%)', bgColor: 'hsl(340, 82%, 95%)' },
-  { id: 'lift', label: 'Lift / Elevator', icon: '🛗', color: 'hsl(173, 80%, 40%)', bgColor: 'hsl(173, 80%, 95%)' },
-  { id: 'other', label: 'Other', icon: '📦', color: 'hsl(220, 9%, 46%)', bgColor: 'hsl(220, 14%, 96%)' },
+  { id: 'electricity', label: 'Electricity', icon: '⚡', color: 'hsl(32, 36%, 38%)', bgColor: 'hsl(36, 32%, 94%)' },
+  { id: 'water', label: 'Water', icon: '💧', color: 'hsl(200, 12%, 38%)', bgColor: 'hsl(200, 14%, 94%)' },
+  { id: 'maintenance', label: 'Maintenance', icon: '🔧', color: 'hsl(80, 14%, 32%)', bgColor: 'hsl(80, 16%, 94%)' },
+  { id: 'cleaning', label: 'Cleaning', icon: '🧹', color: 'hsl(152, 14%, 32%)', bgColor: 'hsl(150, 14%, 94%)' },
+  { id: 'security', label: 'Security', icon: '🛡️', color: 'hsl(30, 8%, 28%)', bgColor: 'hsl(36, 12%, 93%)' },
+  { id: 'repairs', label: 'Repairs', icon: '🛠️', color: 'hsl(12, 32%, 38%)', bgColor: 'hsl(12, 28%, 95%)' },
+  { id: 'lift', label: 'Lift / Elevator', icon: '🛗', color: 'hsl(28, 24%, 36%)', bgColor: 'hsl(32, 22%, 94%)' },
+  { id: 'other', label: 'Other', icon: '📦', color: 'hsl(30, 6%, 42%)', bgColor: 'hsl(36, 12%, 94%)' },
 ]
 
 export const PAYMENT_METHODS: { id: PaymentMethod; label: string }[] = [

@@ -36,9 +36,9 @@ export const FLAT_TYPES: { id: Flat['type']; label: string }[] = [
 ]
 
 export const RENT_STATUS_CONFIG: Record<RentStatus, { label: string; color: string; bgColor: string }> = {
-  paid: { label: 'Paid', color: 'hsl(142, 71%, 35%)', bgColor: 'hsl(142, 71%, 95%)' },
-  pending: { label: 'Pending', color: 'hsl(38, 92%, 45%)', bgColor: 'hsl(38, 92%, 95%)' },
-  overdue: { label: 'Overdue', color: 'hsl(0, 84%, 50%)', bgColor: 'hsl(0, 84%, 95%)' },
-  partial: { label: 'Partial', color: 'hsl(262, 83%, 50%)', bgColor: 'hsl(262, 83%, 95%)' },
+  paid: { label: 'Paid', color: 'hsl(152, 16%, 28%)', bgColor: 'hsl(150, 14%, 94%)' },
+  pending: { label: 'Pending', color: 'hsl(32, 36%, 36%)', bgColor: 'hsl(36, 36%, 94%)' },
+  overdue: { label: 'Overdue', color: 'hsl(8, 42%, 38%)', bgColor: 'hsl(8, 32%, 95%)' },
+  partial: { label: 'Partial', color: 'hsl(28, 24%, 34%)', bgColor: 'hsl(32, 22%, 94%)' },
 }
 
